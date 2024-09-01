@@ -22,15 +22,15 @@ npm install
 buat file .env dan isi dengan configurasi yang dibutuhkan 
 ```bash
 # env
-MYSQL_HOST
-MYSQL_PORT
-DB_NAME
-MYSQL_USERNAME
-MYSQL_PASSWORD
+MYSQL_HOST=
+MYSQL_PORT=
+DB_NAME=
+MYSQL_USERNAME=
+MYSQL_PASSWORD=
 
-MAX_MATA_KULIAH
-MAX_MAHASISWA
-LENGTH_NIM
+MAX_MATA_KULIAH=
+MAX_MAHASISWA=
+LENGTH_NIM=
 ```
 
 ## migration db
