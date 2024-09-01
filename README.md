@@ -49,3 +49,8 @@ npm run start
 
 dan program akan berjalan pada port localhost:3000/be/(nama router terdapat pada router.js)
 ```
+
+API Documentation using postman
+```bash
+https://documenter.getpostman.com/view/16027990/2sAXjM3X6C
+```
