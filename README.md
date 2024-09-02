@@ -19,7 +19,7 @@ npm install
 ```
 
 ## **Configuration database & migration**
-buat file .env dan isi dengan configurasi yang dibutuhkan 
+buat file .env dan isi dengan configurasi yang dibutuhkan pada local anda seperti contoh file .env dibawah
 ```bash
 # env
 MYSQL_HOST=
