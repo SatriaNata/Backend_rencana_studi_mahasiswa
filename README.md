@@ -22,11 +22,11 @@ npm install
 buat file .env dan isi dengan configurasi yang dibutuhkan pada local anda seperti contoh file .env dibawah
 ```bash
 # env
-MYSQL_HOST=
+MYSQL_HOST=localhost
 MYSQL_PORT=
-DB_NAME=
-MYSQL_USERNAME=
-MYSQL_PASSWORD=
+DB_NAME=example_db
+MYSQL_USERNAME=root
+MYSQL_PASSWORD=root
 
 MAX_MATA_KULIAH=
 MAX_MAHASISWA=
