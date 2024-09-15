@@ -2,6 +2,7 @@ const async = require('async')
 const { Op, Trasaction } = require("sequelize")
 const { sequelize } = require("../index")
 const { Transaction } = require("sequelize")
+const { isUUID } = require('../helpers/utils')
 const callback = require('../helpers/callback')
 const jurusanController = require('./jurusan.controller')
 const mata_kuliahs_model = require('../models/mata_kuliah')
@@ -9,7 +10,6 @@ const jurusans_model = require('../models/jurusan')
 
 class mata_kuliahController {
     static mata_kuliah_entity(mata_kuliah) {
-        console.log("abcccc===>",mata_kuliah)
         return {
             id: mata_kuliah.id,
             jurusan: mata_kuliah.jurusan?.nama_jurusan || null,
@@ -103,6 +103,14 @@ class mata_kuliahController {
         const trx = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED })
         async.waterfall([
             (next) => {
+                /* check validation format */
+                const uuid = isUUID(id)
+                if(!uuid){
+                    return next(callback.invalid_uuid())
+                }
+                next()
+            },
+            (next) => {
                 mata_kuliahs_model.findOne({
                     where: {
                         id
@@ -123,7 +131,7 @@ class mata_kuliahController {
                 }, {
                     where: {
                         id
-                    }
+                    }, transaction: trx
                 })
                 .then((result) => {
                     next()
@@ -149,10 +157,18 @@ class mata_kuliahController {
         const trx = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED })
         async.waterfall([
             (next) => {
+                /* check validation format */
+                const uuid = isUUID(id)
+                if(!uuid){
+                    return next(callback.invalid_uuid())
+                }
+                next()
+            },
+            (next) => {
                 mata_kuliahs_model.destroy({
                     where: {
                         id
-                    }
+                    }, transaction: trx
                 })
                 .then((result) => {
                     next()
@@ -163,8 +179,10 @@ class mata_kuliahController {
             }
         ],(err, result) => {
             if (err) {
+                trx.rollback()
                 res.status(500).json({ error: err.message });
             } else {
+                trx.commit()
                 res.json({ result: 'data success deleted' });
             }
         })

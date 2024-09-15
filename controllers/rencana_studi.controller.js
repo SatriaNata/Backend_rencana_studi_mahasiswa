@@ -6,6 +6,7 @@ const callback = require('../helpers/callback')
 require('dotenv').config()
 const { env } = process;
 const { MAX_MATA_KULIAH, MAX_MAHASISWA } = process.env
+const { invalid_mata_kuliah_uuid, isUUID } = require('../helpers/utils')
 
 const rencana_studi_mahasiswas_model = require('../models/rencana_studi_mahasiswa')
 const mahasiswa_model = require('../models/mahasiswa')
@@ -62,6 +63,14 @@ class rencana_kuliahController {
         const { params } = req
         const mahasiswa_id = params?.mahasiswa_id
         async.waterfall([
+            (next) => {
+                /* check validation format */
+                const uuid = isUUID(mahasiswa_id)
+                if(!uuid){
+                    return next(callback.invalid_mahasiswa_uuid())
+                }
+                next()
+            },
             (next) => {
                 rencana_studi_mahasiswas_model.findOne({
                     where: {
@@ -186,13 +195,25 @@ class rencana_kuliahController {
         const trx = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED })
         async.waterfall([
             (next) => {
+                /* check validation format */
+                const mahasiswauUUID = isUUID(mahasiswa_id)
+                if(!mahasiswauUUID){
+                    return next(callback.invalid_mahasiswa_uuid())
+                }
+                const mkUUID = isUUID(mata_kuliah_id)
+                if(!mkUUID){
+                    return next(callback.invalid_mata_kuliah_uuid())
+                }
+                next()
+            },
+            (next) => {
                 rencana_studi_mahasiswas_model.update({
                     mahasiswa_id,
                     mata_kuliah_id
                 }, {
                     where: {
                         id
-                    }
+                    }, transaction: trx
                 })
                 .then((result) => {
                     next()
@@ -233,7 +254,7 @@ class rencana_kuliahController {
                 rencana_studi_mahasiswas_model.destroy({
                     where: {
                         id
-                    }
+                    }, transaction: trx
                 })
                 .then((result) => {
                     next()
@@ -244,8 +265,10 @@ class rencana_kuliahController {
             }
         ], (err, result) => {
             if (err) {
+                trx.rollback()
                 res.status(500).json({ error: err.message });
             } else {
+                trx.commit()
                 res.json({ result: 'data success deleted' });
             }
         })
