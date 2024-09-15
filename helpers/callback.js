@@ -40,8 +40,20 @@ class callback extends Error {
         return new this(1007, 'wrong_format_email')
     }
 
-    static wront_format_nim() {
+    static wrong_format_nim() {
         return new this(1008, `nim length: ${+env.LENGTH_NIM}`)
+    }
+
+    static invalid_uuid() {
+        return new this(1009, 'invalid_uuid')
+    }
+
+    static invalid_mahasiswa_uuid() {
+        return new this(1010, 'invalid_mahasiswa_uuid')
+    }
+    
+    static invalid_mata_kuliah_uuid() {
+        return new this(1011, 'invalid_mata_kuliah_uuid')
     }
 
 }

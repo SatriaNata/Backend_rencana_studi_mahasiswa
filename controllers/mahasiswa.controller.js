@@ -2,8 +2,8 @@ const async = require('async')
 const { Op, Trasaction } = require("sequelize")
 const { sequelize } = require("../index")
 const { Transaction } = require("sequelize")
+const { check_format_format, check_format_nim, isUUID } = require('../helpers/utils')
 const callback = require('../helpers/callback')
-const utils = require('../helpers/utils')
 
 const mahasiswa_model = require('../models/mahasiswa')
 
@@ -50,6 +50,14 @@ class mahasiswaController {
         const id = params?.id
         async.waterfall([
             (next) => {
+                /* Check UUID format */
+                const uuid = isUUID(id)
+                if(!uuid){
+                    return next(callback.invalid_uuid())
+                }
+                next()
+            },
+            (next) => {
                 mahasiswa_model.findOne({
                     where: {
                         id
@@ -80,8 +88,8 @@ class mahasiswaController {
         async.waterfall([
             (next) => {
                 /* check validation format */
-                if(email && !utils.check_format_format(email)) return next(callback.wrong_format_email())
-                if(nim && !utils.check_format_nim(nim)) return next(callback.wront_format_nim())
+                if(email && !check_format_format(email)) return next(callback.wrong_format_email())
+                if(nim && !check_format_nim(nim)) return next(callback.wront_format_nim())
                 next()
             },
             (next) => {
@@ -124,8 +132,12 @@ class mahasiswaController {
         async.waterfall([
             (next) => {
                 /* check validation format */
-                if(email && !utils.check_format_format(email)) return next(callback.wrong_format_email())
-                if(nim && !utils.check_format_nim(nim)) return next(callback.wront_format_nim())
+                if(email && !check_format_format(email)) return next(callback.wrong_format_email())
+                if(nim && !check_format_nim(nim)) return next(callback.wront_format_nim())
+                const uuid = isUUID(id)
+                if(!uuid){
+                    return next(callback.invalid_uuid())
+                }
                 next()
             },
             (next) => {
@@ -177,10 +189,18 @@ class mahasiswaController {
         const trx = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED })
         async.waterfall([
             (next) => {
+                /* Check UUID format */
+                const uuid = isUUID(id)
+                if(!uuid){
+                    return next(callback.invalid_uuid())
+                }
+                next()
+            },
+            (next) => {
                 mahasiswa_model.destroy({
                     where: {
                         id
-                    }
+                    }, transaction: trx
                 })
                 .then((result) => {
                     res.json(result)
@@ -191,8 +211,10 @@ class mahasiswaController {
             }
         ], (err, result) => {
             if (err) {
+                trx.rollback()
                 res.status(500).json({ error: err.message });
             } else {
+                trx.commit()
                 res.json({ result: 'data success deleted' });
             }
         })

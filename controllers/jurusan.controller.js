@@ -2,6 +2,7 @@ const async = require('async')
 const { Op, Trasaction } = require("sequelize")
 const { sequelize } = require("../index")
 const { Transaction } = require("sequelize")
+const { isUUID } = require('../helpers/utils')
 const callback = require('../helpers/callback')
 const jurusans_model = require('../models/jurusan')
 
@@ -96,6 +97,14 @@ class jurusanController {
         const trx = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED })
         async.waterfall([
             (next) => {
+                /* Check UUID format */
+                const uuid = isUUID(id)
+                if (!uuid) {
+                    return next(callback.invalid_uuid())
+                }
+                next()
+            },
+            (next) => {
                 jurusans_model.findOne({
                     where: {
                         [Op.or]: [
@@ -147,6 +156,14 @@ class jurusanController {
 
         const trx = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED })
         async.waterfall([
+            (next) => {
+                /* Check UUID format */
+                const uuid = isUUID(id)
+                if (!uuid) {
+                    return next(callback.invalid_uuid())
+                }
+                next()
+            },
             (next) => {
                 jurusans_model.findOne({
                     where: { id },
